@@ -289,6 +289,49 @@ var _ = Describe("InfrastructureConfig validation", func() {
 					"Detail": Equal("NatGateway is currently only supported for zoned cluster"),
 				}))
 			})
+
+			It("should return an error using a NatGateway as it not enabled but ip addresses are configured", func() {
+				infrastructureConfig.Zoned = true
+				infrastructureConfig.Networks.NatGateway = &apisazure.NatGatewayConfig{
+					Enabled: false,
+					IPAddresses: []apisazure.AzResourceReference{{
+						Name:          "test-ip",
+						ResourceGroup: "test-rg",
+					}},
+				}
+				errorList := ValidateInfrastructureConfig(infrastructureConfig, &nodes, &pods, &services, fldPath)
+				Expect(errorList).To(HaveLen(1))
+				Expect(errorList).To(ConsistOfFields(Fields{
+					"Type":   Equal(field.ErrorTypeInvalid),
+					"Field":  Equal("networks.natGateway"),
+					"Detail": Equal("NatGateway is not enabled but ip addresses or ip ranges are specified"),
+				}))
+			})
+
+			It("should return an error using a NatGateway as referenced ip is invalid", func() {
+				infrastructureConfig.Zoned = true
+				infrastructureConfig.Networks.NatGateway = &apisazure.NatGatewayConfig{
+					Enabled: true,
+					IPAddresses: []apisazure.AzResourceReference{{
+						Name: "test-ip",
+					}},
+					IPAddressRanges: []apisazure.AzResourceReference{{
+						ResourceGroup: "test-rg",
+					}},
+				}
+				errorList := ValidateInfrastructureConfig(infrastructureConfig, &nodes, &pods, &services, fldPath)
+				Expect(errorList).To(HaveLen(2))
+				Expect(errorList).To(ConsistOfFields(Fields{
+					"Type":   Equal(field.ErrorTypeInvalid),
+					"Field":  Equal("networks.natGateway.ipAddresses[0]"),
+					"Detail": Equal("resourceGroup must be set"),
+				},
+					Fields{
+						"Type":   Equal(field.ErrorTypeInvalid),
+						"Field":  Equal("networks.natGateway.ipAddressRanges[0]"),
+						"Detail": Equal("name must be set"),
+					}))
+			})
 		})
 	})
 

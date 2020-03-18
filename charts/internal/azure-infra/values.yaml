@@ -15,6 +15,18 @@ create:
   # name: identity-name
   # resourceGroup: identity-resource-group
 
+# natGateway:
+#   ipAddresses:
+#   - name: ip-name
+#     resourceGroup: ip-resource-group
+#   - name: ip-name
+#     resourceGroup: ip-resource-group
+#   ipAddressRanges:
+#   - name: ip-range-name
+#     resourceGroup: ip-range-resource-group
+#   - name: ip-range-name
+#     resourceGroup: ip-range-resource-group
+
 resourceGroup:
   name: my-resource-group
   vnet:

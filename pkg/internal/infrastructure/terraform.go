@@ -73,6 +73,7 @@ func ComputeTerraformerChartValues(infra *extensionsv1alpha1.Infrastructure, cli
 		resourceGroupName     = infra.Namespace
 
 		identityConfig map[string]interface{}
+		natConfig      map[string]interface{}
 		azure          = map[string]interface{}{
 			"subscriptionID": clientAuth.SubscriptionID,
 			"tenantID":       clientAuth.TenantID,
@@ -136,6 +137,9 @@ func ComputeTerraformerChartValues(infra *extensionsv1alpha1.Infrastructure, cli
 
 	if config.Networks.NatGateway != nil && config.Networks.NatGateway.Enabled {
 		createNatGateway = true
+		if natValues := getNatGatewayValues(config.Networks.NatGateway); natValues != nil {
+			natConfig = *natValues
+		}
 	}
 
 	if config.Identity != nil && config.Identity.Name != "" && config.Identity.ResourceGroup != "" {
@@ -162,6 +166,7 @@ func ComputeTerraformerChartValues(infra *extensionsv1alpha1.Infrastructure, cli
 				"serviceEndpoints": config.Networks.ServiceEndpoints,
 			},
 		},
+		"natGateway":  natConfig,
 		"clusterName": infra.Namespace,
 		"networks": map[string]interface{}{
 			"worker": config.Networks.Workers,
@@ -169,6 +174,38 @@ func ComputeTerraformerChartValues(infra *extensionsv1alpha1.Infrastructure, cli
 		"identity":   identityConfig,
 		"outputKeys": outputKeys,
 	}, nil
+}
+
+func getNatGatewayValues(natConfig *api.NatGatewayConfig) *map[string]interface{} {
+	if natConfig == nil || !natConfig.Enabled {
+		return nil
+	}
+	if len(natConfig.IPAddresses) == 0 && len(natConfig.IPAddressRanges) == 0 {
+		return nil
+	}
+	var values = map[string]interface{}{}
+	if ipAddresses := resourceReferencesToValue(&natConfig.IPAddresses); ipAddresses != nil {
+		values["ipAddresses"] = *ipAddresses
+	}
+	if ipAddressRanges := resourceReferencesToValue(&natConfig.IPAddressRanges); ipAddressRanges != nil {
+		values["ipAddressRanges"] = *ipAddressRanges
+	}
+	return &values
+}
+
+func resourceReferencesToValue(references *[]api.AzResourceReference) *[]map[string]interface{} {
+	var count = len(*references)
+	if count == 0 {
+		return nil
+	}
+	var result = make([]map[string]interface{}, count)
+	for i, ref := range *references {
+		result[i] = map[string]interface{}{
+			"name":          ref.Name,
+			"resourceGroup": ref.ResourceGroup,
+		}
+	}
+	return &result
 }
 
 // RenderTerraformerChart renders the azure-infra chart with the given values.

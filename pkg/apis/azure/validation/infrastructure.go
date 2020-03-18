@@ -92,6 +92,20 @@ func ValidateInfrastructureConfig(infra *apisazure.InfrastructureConfig, nodesCI
 	if !infra.Zoned && infra.Networks.NatGateway != nil {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networks", "natGateway"), infra.Networks.NatGateway, "NatGateway is currently only supported for zoned cluster"))
 	}
+	if infra.Zoned && infra.Networks.NatGateway != nil {
+		if !infra.Networks.NatGateway.Enabled && (len(infra.Networks.NatGateway.IPAddresses) > 0 || len(infra.Networks.NatGateway.IPAddressRanges) > 0) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("networks", "natGateway"), infra.Networks.NatGateway, "NatGateway is not enabled but ip addresses or ip ranges are specified"))
+		} else {
+			ipAddressesField := fldPath.Child("networks", "natGateway", "ipAddresses")
+			for i, ip := range infra.Networks.NatGateway.IPAddresses {
+				allErrs = append(allErrs, validateAzResourceReference(&ip, ipAddressesField.Index(i))...)
+			}
+			ipAddressRangesField := fldPath.Child("networks", "natGateway", "ipAddressRanges")
+			for i, ipRange := range infra.Networks.NatGateway.IPAddressRanges {
+				allErrs = append(allErrs, validateAzResourceReference(&ipRange, ipAddressRangesField.Index(i))...)
+			}
+		}
+	}
 
 	if infra.Identity != nil && (infra.Identity.Name == "" || infra.Identity.ResourceGroup == "") {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("identity"), infra.Identity, "specifying an identity requires the name of the identity and the resource group which hosts the identity"))
@@ -101,6 +115,17 @@ func ValidateInfrastructureConfig(infra *apisazure.InfrastructureConfig, nodesCI
 		allErrs = append(allErrs, nodes.ValidateSubset(workerCIDR)...)
 	}
 
+	return allErrs
+}
+
+func validateAzResourceReference(ref *apisazure.AzResourceReference, fieldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+	if ref.Name == "" {
+		allErrs = append(allErrs, field.Invalid(fieldPath, ref.Name, "name must be set"))
+	}
+	if ref.ResourceGroup == "" {
+		allErrs = append(allErrs, field.Invalid(fieldPath, ref.ResourceGroup, "resourceGroup must be set"))
+	}
 	return allErrs
 }
 

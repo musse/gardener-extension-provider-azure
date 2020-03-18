@@ -326,6 +326,47 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="azure.provider.extensions.gardener.cloud/v1alpha1.AzResourceReference">AzResourceReference
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#azure.provider.extensions.gardener.cloud/v1alpha1.NatGatewayConfig">NatGatewayConfig</a>)
+</p>
+<p>
+<p>AzResourceReference contains information to identify a generic Azure resource.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced Azure resource.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resourceGroup</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ResourceGroup is the resource group which contain the referenced Azure resource.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="azure.provider.extensions.gardener.cloud/v1alpha1.CloudControllerManagerConfig">CloudControllerManagerConfig
 </h3>
 <p>
@@ -772,6 +813,34 @@ bool
 </td>
 <td>
 <p>Enabled is an indicator if NAT gateway should be deployed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipAddresses</code></br>
+<em>
+<a href="#azure.provider.extensions.gardener.cloud/v1alpha1.AzResourceReference">
+[]AzResourceReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IPAddresses is a list of ip addresses which should be assigned to the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipAddressRanges</code></br>
+<em>
+<a href="#azure.provider.extensions.gardener.cloud/v1alpha1.AzResourceReference">
+[]AzResourceReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IPAddressRanges is a list of ip address ranges/prefixes which should be assigned to the NAT gateway.</p>
 </td>
 </tr>
 </tbody>

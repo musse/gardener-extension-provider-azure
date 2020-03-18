@@ -33,6 +33,14 @@ type InfrastructureConfig struct {
 	Zoned bool
 }
 
+// AzResourceReference contains information to identify a generic Azure resource.
+type AzResourceReference struct {
+	// Name is the name of the referenced Azure resource.
+	Name string
+	// ResourceGroup is the resource group which contain the referenced Azure resource.
+	ResourceGroup string
+}
+
 // ResourceGroup is azure resource group
 type ResourceGroup struct {
 	// Name is the name of the resource group
@@ -146,6 +154,10 @@ type VNetStatus struct {
 type NatGatewayConfig struct {
 	// Enabled is an indicator if NAT gateway should be deployed.
 	Enabled bool
+	// IPAddresses is a list of ip addresses which should be assigned to the NAT gateway.
+	IPAddresses []AzResourceReference
+	// IPAddressRanges is a list of ip address ranges/prefixes which should be assigned to the NAT gateway.
+	IPAddressRanges []AzResourceReference
 }
 
 // IdentityConfig contains configuration for the managed identity.
