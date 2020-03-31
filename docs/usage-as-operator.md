@@ -6,10 +6,6 @@ In this document we are describing how this configuration looks like for Azure a
 
 ## `CloudProfileConfig`
 
-The cloud profile configuration contains information about the update and failure domain counts in the Azure regions you want to offer.
-Additionally, it contains the real machine image identifiers in the Azure environment. You can provide either URN or image ID.
-You have to map every version that you specify in `.spec.machineImages[].versions` here such that the Azure extension knows the machine image identifiers for every version you want to offer.
-
 An example `CloudProfileConfig` for the Azure extension looks as follows:
 
 ```yaml
@@ -21,14 +17,24 @@ countUpdateDomains:
 countFaultDomains:
 - region: westeurope
   count: 3
+acceleratedNetworingMachineTypes:
+- Standard_D3_v2
 machineImages:
 - name: coreos
   versions:
   - version: 2135.6.0
     urn: "CoreOS:CoreOS:Stable:2135.6.0"
+    acceleratedNetworking: true
   - version: 2303.3.0
     id: "/Subscriptions/4bfa08b6-bad8-4b8e-aa00-741c0a859e36/Providers/Microsoft.Compute/Locations/westus/Publishers/CoreOS/ArtifactTypes/VMImage/Offers/CoreOS/Skus/Stable/Versions/2303.3.0"
 ```
+
+The cloud profile configuration contains information about the update via `.countUpdateDomains[]` and failure domain via `.countFaultDomains[]` counts in the Azure regions you want to offer.
+
+Additionally, it contains the real machine image identifiers in the Azure environment. You have to map every image version that you specify in `.spec.machineImages[].versions` such that the Azure extension knows the machine image identifiers for every version you want to offer. You can provide either URN (`.machineImages[].versions[].urn`) or image ID (`.machineImages[].versions[].id`) for each image version. It's also possible to specify for each image version if the version is supporting Azure accelerated networking via `.machineImages[].versions[].acceleratedNetworking`.
+
+Via `.acceleratedNetworingMachineTypes` you can specify the machine types which come into question for usage of Azure accelerated networking.
+
 
 ## Example `CloudProfile` manifest
 

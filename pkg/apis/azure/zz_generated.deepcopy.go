@@ -84,6 +84,11 @@ func (in *CloudProfileConfig) DeepCopyInto(out *CloudProfileConfig) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.AcceleratedNetworkingMachineTypes != nil {
+		in, out := &in.AcceleratedNetworkingMachineTypes, &out.AcceleratedNetworkingMachineTypes
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	return
 }
 
@@ -308,6 +313,11 @@ func (in *MachineImageVersion) DeepCopyInto(out *MachineImageVersion) {
 	if in.ID != nil {
 		in, out := &in.ID, &out.ID
 		*out = new(string)
+		**out = **in
+	}
+	if in.AcceleratedNetworking != nil {
+		in, out := &in.AcceleratedNetworking, &out.AcceleratedNetworking
+		*out = new(bool)
 		**out = **in
 	}
 	return

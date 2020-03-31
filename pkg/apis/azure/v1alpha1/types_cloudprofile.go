@@ -32,6 +32,8 @@ type CloudProfileConfig struct {
 	// MachineImages is the list of machine images that are understood by the controller. It maps
 	// logical names and versions to provider-specific identifiers.
 	MachineImages []MachineImages `json:"machineImages"`
+	// AcceleratedNetworkingMachineTypes is a list of machine types which support accelerated networking.
+	AcceleratedNetworkingMachineTypes []string `json:"acceleratedNetworingMachineTypes,omitempty"`
 }
 
 // DomainCount defines the region and the count for this domain count value.
@@ -60,4 +62,6 @@ type MachineImageVersion struct {
 	//ID is the VM image ID
 	// +optional
 	ID *string `json:"id,omitempty"`
+	// AcceleratedNetworing is an indicator if the image does support Azure accelerated networking.
+	AcceleratedNetworking *bool `json:"acceleratedNetworking,omitempty"`
 }

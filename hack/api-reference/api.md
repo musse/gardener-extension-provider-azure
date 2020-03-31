@@ -89,6 +89,17 @@ string
 logical names and versions to provider-specific identifiers.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>acceleratedNetworingMachineTypes</code></br>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>AcceleratedNetworkingMachineTypes is a list of machine types which support accelerated networking.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="azure.provider.extensions.gardener.cloud/v1alpha1.ControlPlaneConfig">ControlPlaneConfig
@@ -724,6 +735,17 @@ string
 <td>
 <em>(Optional)</em>
 <p>ID is the VM image ID</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>acceleratedNetworking</code></br>
+<em>
+bool
+</em>
+</td>
+<td>
+<p>AcceleratedNetworing is an indicator if the image does support Azure accelerated networking.</p>
 </td>
 </tr>
 </tbody>

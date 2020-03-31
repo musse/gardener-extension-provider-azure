@@ -306,6 +306,7 @@ func autoConvert_v1alpha1_CloudProfileConfig_To_azure_CloudProfileConfig(in *Clo
 	out.CountUpdateDomains = *(*[]azure.DomainCount)(unsafe.Pointer(&in.CountUpdateDomains))
 	out.CountFaultDomains = *(*[]azure.DomainCount)(unsafe.Pointer(&in.CountFaultDomains))
 	out.MachineImages = *(*[]azure.MachineImages)(unsafe.Pointer(&in.MachineImages))
+	out.AcceleratedNetworkingMachineTypes = *(*[]string)(unsafe.Pointer(&in.AcceleratedNetworkingMachineTypes))
 	return nil
 }
 
@@ -318,6 +319,7 @@ func autoConvert_azure_CloudProfileConfig_To_v1alpha1_CloudProfileConfig(in *azu
 	out.CountUpdateDomains = *(*[]DomainCount)(unsafe.Pointer(&in.CountUpdateDomains))
 	out.CountFaultDomains = *(*[]DomainCount)(unsafe.Pointer(&in.CountFaultDomains))
 	out.MachineImages = *(*[]MachineImages)(unsafe.Pointer(&in.MachineImages))
+	out.AcceleratedNetworkingMachineTypes = *(*[]string)(unsafe.Pointer(&in.AcceleratedNetworkingMachineTypes))
 	return nil
 }
 
@@ -516,6 +518,7 @@ func autoConvert_v1alpha1_MachineImageVersion_To_azure_MachineImageVersion(in *M
 	out.Version = in.Version
 	out.URN = (*string)(unsafe.Pointer(in.URN))
 	out.ID = (*string)(unsafe.Pointer(in.ID))
+	out.AcceleratedNetworking = (*bool)(unsafe.Pointer(in.AcceleratedNetworking))
 	return nil
 }
 
@@ -528,6 +531,7 @@ func autoConvert_azure_MachineImageVersion_To_v1alpha1_MachineImageVersion(in *a
 	out.Version = in.Version
 	out.URN = (*string)(unsafe.Pointer(in.URN))
 	out.ID = (*string)(unsafe.Pointer(in.ID))
+	out.AcceleratedNetworking = (*bool)(unsafe.Pointer(in.AcceleratedNetworking))
 	return nil
 }
 

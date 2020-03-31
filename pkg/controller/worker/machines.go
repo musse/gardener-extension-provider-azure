@@ -174,12 +174,13 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 					Annotations:    pool.Annotations,
 					Taints:         pool.Taints,
 				}
-
+				networkConfig = map[string]interface{}{
+					"vnet":   infrastructureStatus.Networks.VNet.Name,
+					"subnet": nodesSubnet.Name,
+				}
 				machineClassSpec = map[string]interface{}{
 					"region":        w.worker.Spec.Region,
 					"resourceGroup": infrastructureStatus.ResourceGroup.Name,
-					"vnetName":      infrastructureStatus.Networks.VNet.Name,
-					"subnetName":    nodesSubnet.Name,
 					"tags": map[string]interface{}{
 						"Name": w.worker.Namespace,
 						fmt.Sprintf("kubernetes.io-cluster-%s", w.worker.Namespace): "1",
@@ -198,12 +199,16 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 				machineClassSpec["vnetResourceGroup"] = *infrastructureStatus.Networks.VNet.ResourceGroup
 			}
 
+			if w.enableAcceleratedNetworking(pool.MachineType, pool.MachineImage.Name, pool.MachineImage.Version) {
+				networkConfig["acceleratedNetworking"] = true
+			}
+			machineClassSpec["network"] = networkConfig
+
 			if zone != nil {
 				machineDeployment.Minimum = worker.DistributeOverZones(zone.index, pool.Minimum, zone.count)
 				machineDeployment.Maximum = worker.DistributeOverZones(zone.index, pool.Maximum, zone.count)
 				machineDeployment.MaxSurge = worker.DistributePositiveIntOrPercent(zone.index, pool.MaxSurge, zone.count, pool.Maximum)
 				machineDeployment.MaxUnavailable = worker.DistributePositiveIntOrPercent(zone.index, pool.MaxUnavailable, zone.count, pool.Minimum)
-
 				machineClassSpec["zone"] = zone.name
 			}
 			if availabilitySetID != nil {
@@ -267,4 +272,33 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 	w.machineImages = machineImages
 
 	return nil
+}
+
+func (w *workerDelegate) enableAcceleratedNetworking(machineType, machineImageName, machineImageVersion string) bool {
+	// Check if used operating system and version are supporting accelerated networking.
+	var osSupport bool
+	for _, image := range w.cloudProfileConfig.MachineImages {
+		if image.Name != machineImageName {
+			continue
+		}
+		for _, imageVersion := range image.Versions {
+			if imageVersion.Version == machineImageVersion {
+				if imageVersion.AcceleratedNetworking != nil && *imageVersion.AcceleratedNetworking {
+					osSupport = true
+				} else {
+					return false
+				}
+			}
+		}
+	}
+
+	// Check if machine type is in list of accelerated networking supporting machine types.
+	var machineTypeSupport bool
+	for _, machType := range w.cloudProfileConfig.AcceleratedNetworkingMachineTypes {
+		if machType == machineType {
+			machineTypeSupport = true
+			break
+		}
+	}
+	return osSupport && machineTypeSupport
 }

@@ -210,3 +210,9 @@ spec:
     nginxIngress:
       enabled: true
 ```
+
+## Miscellaneous
+
+### Azure Accelerated Networking
+Machine(s) will be automatically configured to use [Azure Accelerated Networking](https://docs.microsoft.com/en-us/azure/virtual-network/create-vm-accelerated-networking-cli) in case the machine type and machine image version is configured in the CloudProfile to be compatible with Accelerated Networking.
+Supported machine types are listed in `.spec.providerConfig.acceleratedNetworingMachineTypes[]` and the supported machine image versions are listed in `.spec.providerConfig.machineImages[].versions[].acceleratedNetworking`.
